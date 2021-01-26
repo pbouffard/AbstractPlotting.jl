@@ -27,6 +27,11 @@ function layoutable(::Type{Slider}, fig_or_scene; bbox = nothing, kwargs...)
         end
     end
 
+    subarea = lift(layoutobservables.computedbbox) do bbox
+        round_to_IRect2D(bbox)
+    end
+    subscene = Scene(topscene, subarea, camera=campixel!)
+
     sliderbox = lift(identity, layoutobservables.computedbbox)
 
     endpoints = lift(sliderbox, horizontal) do bb, horizontal
@@ -101,7 +106,7 @@ function layoutable(::Type{Slider}, fig_or_scene; bbox = nothing, kwargs...)
     button = scatter!(topscene, middlepoint, color = color_active, strokewidth = 0, markersize = buttonsize, raw = true)
     decorations[:button] = button
 
-    mouseevents = addmouseevents!(topscene, linesegs, button)
+    mouseevents = addmouseevents!(subscene) #, linesegs, button)
 
     onmouseleftdrag(mouseevents) do event
 
@@ -131,7 +136,7 @@ function layoutable(::Type{Slider}, fig_or_scene; bbox = nothing, kwargs...)
     end
 
     onmouseleftdown(mouseevents) do event
-        @info "onmouseleftdown($mousestate)"
+        @info "onmouseleftdown($mouseevents)"
         pos = event.px
         dim = horizontal[] ? 1 : 2
         frac = (pos[dim] - endpoints[][1][dim]) / (endpoints[][2][dim] - endpoints[][1][dim])

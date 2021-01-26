@@ -121,6 +121,7 @@ function layoutable(::Type{Textbox}, fig_or_scene; bbox = nothing, kwargs...)
     layoutobservables.suggestedbbox[] = layoutobservables.suggestedbbox[]
 
     mousestate = addmouseevents!(scene)
+    @show mousestate
 
     onmouseleftdown(mousestate) do state
         @info "onmouseleftdown($mousestate)"

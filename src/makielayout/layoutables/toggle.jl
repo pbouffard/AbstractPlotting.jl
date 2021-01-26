@@ -14,6 +14,12 @@ function layoutable(::Type{Toggle}, fig_or_scene; bbox = nothing, kwargs...)
     layoutobservables = LayoutObservables{Toggle}(attrs.width, attrs.height, attrs.tellwidth, attrs.tellheight,
         halign, valign, attrs.alignmode; suggestedbbox = bbox)
 
+    subarea = lift(layoutobservables.computedbbox) do bbox
+        round_to_IRect2D(bbox)
+    end
+    subscene = Scene(topscene, subarea, camera=campixel!)
+    
+
     markersize = lift(layoutobservables.computedbbox) do bbox
         min(width(bbox), height(bbox))
     end
@@ -57,7 +63,7 @@ function layoutable(::Type{Toggle}, fig_or_scene; bbox = nothing, kwargs...)
     button = scatter!(topscene, buttonpos, markersize = buttonsize, color = buttoncolor, strokewidth = 0, raw = true)
     decorations[:button] = button
 
-    mouseevents = addmouseevents!(topscene, button, frame)
+    mouseevents = addmouseevents!(subscene) #, button, frame)
 
     onmouseleftdown(mouseevents) do event
         if animating[]
