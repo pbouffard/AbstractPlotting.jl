@@ -1,6 +1,6 @@
 function layoutable(::Type{Button}, fig_or_scene::FigureLike; bbox = nothing, kwargs...)
 
-    scene = get_scene(fig_or_scene)
+    scene = get_topscene(fig_or_scene)
 
     default_attrs = default_attributes(Button, scene).attributes
     theme_attrs = subtheme(scene, :Button)
@@ -18,12 +18,13 @@ function layoutable(::Type{Button}, fig_or_scene::FigureLike; bbox = nothing, kw
 
     textpos = Node(Point2f0(0, 0))
 
-    subarea = lift(layoutobservables.computedbbox) do bbox
-        round_to_IRect2D(bbox)
+    scenearea = lift(layoutobservables.computedbbox) do bbox
+        #round_to_IRect2D(bbox)
+        Rect(round.(Int, bbox.origin), round.(Int, bbox.widths))
     end
-    subscene = Scene(scene, subarea, camera=campixel!)
+    subscene = Scene(scene, scenearea, camera=campixel!)
 
-
+    # scene = Scene(scene, scenearea, raw = true, camera = campixel!)
 
     # buttonrect is without the left bottom offset of the bbox
     buttonrect = lift(layoutobservables.computedbbox) do bbox
@@ -37,6 +38,7 @@ function layoutable(::Type{Button}, fig_or_scene::FigureLike; bbox = nothing, kw
     roundedrectpoints = lift(roundedrectvertices, buttonrect, cornerradius, cornersegments)
 
     mousestate = Node(:out)
+    # mousestate = addmouseevents!(scene)
 
     bcolors = (; out = buttoncolor, active = buttoncolor_active, hover = buttoncolor_hover)
     bcolor = lift((s,_...)->bcolors[s][], mousestate, values(bcolors)...; typ=Any)
@@ -69,18 +71,22 @@ function layoutable(::Type{Button}, fig_or_scene::FigureLike; bbox = nothing, kw
     mouseevents = addmouseevents!(scene, button, labeltext)
 
     onmouseover(mouseevents) do _
+        @info "onmouseover(mouseevents)"
         mousestate[] = :hover
     end
 
     onmouseout(mouseevents) do _
+        @info "onmouseout(mouseevents)"
         mousestate[] = :out
     end
     
     onmouseleftup(mouseevents) do _
+        @info "onmouseleftup(mouseevents)"
         mousestate[] = :hover
     end
 
     onmouseleftdown(mouseevents) do _
+        @info "onmouseleftdown($mousestate)"
         mousestate[] = :active
         clicks[] = clicks[] + 1
     end

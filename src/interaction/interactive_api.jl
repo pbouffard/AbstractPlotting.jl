@@ -8,6 +8,7 @@ export select_rectangle, select_line, select_point
 Returns true if the mouse currently hovers any of `plots`.
 """
 function mouseover(scene::SceneLike, plots::AbstractPlot...)
+    @info "mouseover(scene::SceneLike, plots::AbstractPlot...)"
     p, idx = mouse_selection(scene)
     return p in flatten_plots(plots)
 end
@@ -20,6 +21,7 @@ Calls `f(idx)` whenever the mouse is over any of `plots`.
 hovered element
 """
 function onpick(f, scene::SceneLike, plots::AbstractPlot...; range=1)
+    @info "onpick"
     fplots = flatten_plots(plots)
     args = range == 1 ? (scene,) : (scene, range)
     map_once(events(scene).mouseposition) do mp
@@ -34,9 +36,11 @@ end
 Returns the plot that is under the current mouse position
 """
 function mouse_selection(scene::SceneLike)
+    @info "mouse_selection((scene::SceneLike))"
     pick(scene, events(scene).mouseposition[])
 end
 function mouse_selection(scene::SceneLike, range)
+    @info "mouse_selection(scene::SceneLike, range)"
     pick(scene, events(scene).mouseposition[], range)
 end
 
@@ -79,6 +83,7 @@ end
 Return the plot under pixel position x y
 """
 function pick(scene::SceneLike, x::Number, y::Number)
+    @info "pick(scene::SceneLike, x::Number, y::Number)"
     return pick(scene, Vec{2, Float64}(x, y))
 end
 
@@ -89,11 +94,13 @@ end
 Return the plot under pixel position xy
 """
 function pick(scene::SceneLike, xy)
+    @info "pick(scene::SceneLike, xy)"
     screen = getscreen(scene)
     screen === nothing && return (nothing, 0)
     pick(scene, screen, Vec{2, Float64}(xy))
 end
 function pick(scene::SceneLike, xy, range)
+    @info "pick(scene::SceneLike, xy, range)"
     screen = getscreen(scene)
     screen === nothing && return (nothing, 0)
     pick(scene, screen, Vec{2, Float64}(xy), Float64(range))
@@ -147,6 +154,7 @@ rectangle has area > 0.
 The `kwargs...` are propagated into `lines!` which plots the selected rectangle.
 """
 function select_rectangle(scene; strokewidth = 3.0, kwargs...)
+    @info "select_rectangle(scene; strokewidth = 3.0, kwargs...)"
     key = Mouse.left
     waspressed = Node(false)
     rect = Node(FRect(0, 0, 1, 1)) # plotted rectangle
@@ -250,6 +258,7 @@ The value of the returned point is updated **only** when the user un-clicks.
 The `kwargs...` are propagated into `scatter!` which plots the selected point.
 """
 function select_point(scene; kwargs...)
+    @info "select_point(scene; kwargs...)"
     key = Mouse.left
     pmarker = Circle(Point2f0(0, 0), Float32(1))
     waspressed = Node(false)

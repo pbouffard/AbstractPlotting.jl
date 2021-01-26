@@ -123,6 +123,7 @@ function layoutable(::Type{Textbox}, fig_or_scene; bbox = nothing, kwargs...)
     mousestate = addmouseevents!(scene)
 
     onmouseleftdown(mousestate) do state
+        @info "onmouseleftdown($mousestate)"
         focus!(ltextbox)
 
         if displayed_string[] == placeholder[]

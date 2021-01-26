@@ -131,7 +131,7 @@ function layoutable(::Type{Slider}, fig_or_scene; bbox = nothing, kwargs...)
     end
 
     onmouseleftdown(mouseevents) do event
-
+        @info "onmouseleftdown($mousestate)"
         pos = event.px
         dim = horizontal[] ? 1 : 2
         frac = (pos[dim] - endpoints[][1][dim]) / (endpoints[][2][dim] - endpoints[][1][dim])
